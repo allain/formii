@@ -37,6 +37,15 @@ describe('Formii', function () {
       done();
     });
 
+    it('textarea type', function(done) {
+      var f = new Formii([
+        {name: 'a', type: 'textarea'}
+      ]);
+
+      assert.equal('<div class="fields"><div class="field"><textarea id="a" name="a"></textarea></div></div>', f.html());
+      done();
+    });
+
     it('radio type', function (done) {
       var f = new Formii([
         {name: 'a', type: 'radio', options: [
@@ -49,11 +58,11 @@ describe('Formii', function () {
         '<div class="fields">',
         '<div class="field">',
         '<div class="option">',
-        '<input type="radio" name="a" id="a" value="b">',
+        '<input type="radio" id="a" name="a" value="b">',
         '<label>B</label>',
         '</div>',
         '<div class="option">',
-        '<input type="radio" name="a" id="a" value="c">',
+        '<input type="radio" id="a" name="a" value="c">',
         '<label>C</label>',
         '</div>',
         '</div>',
@@ -72,7 +81,7 @@ describe('Formii', function () {
       assert.equal([
         '<div class="fields">',
         '<div class="field">',
-        '<select name="a" id="a">',
+        '<select id="a" name="a">',
         '<option value="b">B</option>',
         '<option value="c">C</option>',
         '</select>',

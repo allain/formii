@@ -4,13 +4,18 @@ var Handlebars = require('handlebars');
 module.exports = Formii;
 
 function Formii(specs, options) {
+  if (!(this instanceof Formii)) {
+    return new Formii(spec, options);
+  }
+
   options = defaults(options, {
     templates: {
       text: '<input type="text" id="{{name}}" name="{{name}}">',
       checkbox: '<input type="checkbox" id="{{name}}" name="{{name}}" value="{{#if value}}{{value}}{{else}}1{{/if}}">',
       password: '<input type="password" id="{{name}}" name="{{name}}">',
-      radio: '{{#each options}}<div class="option"><input type="radio" name="{{../name}}" id="{{../name}}" value="{{value}}"><label>{{label}}</label></div>{{/each}}',
-      select: '<select name="{{name}}" id="{{name}}">{{#each options}}<option value="{{value}}">{{label}}</option>{{/each}}</select>'
+      radio: '{{#each options}}<div class="option"><input type="radio" id="{{../name}}" name="{{../name}}" value="{{value}}"><label>{{label}}</label></div>{{/each}}',
+      select: '<select id="{{name}}" name="{{name}}">{{#each options}}<option value="{{value}}">{{label}}</option>{{/each}}</select>',
+      textarea: '<textarea id="{{name}}" name="{{name}}">{{value}}</textarea>'
     }
   });
 
@@ -18,9 +23,7 @@ function Formii(specs, options) {
     options.templates[templateName] = Handlebars.compile(options.templates[templateName]);
   });
 
-  if (!(this instanceof Formii)) {
-    return new Formii(spec, options);
-  }
+
 
   this.html = function() {
     return flatten([

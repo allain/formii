@@ -29,9 +29,9 @@ function Formii(specs, options) {
 
   this.html = function(doc) {
     return flatten([
-      '<div class="form">',
+      '<form class="form">',
       generateFields(specs, doc || {}),
-      '</div>'
+      '</form>'
     ]).filter(Boolean).join('');
   };
 
@@ -68,10 +68,12 @@ function Formii(specs, options) {
       spec.id = p([prefix, spec.name]);
 
       if (spec.type === 'radio' || spec.type === 'select') {
-        activateOption(spec.options, hasValue(spec.value)) || activateOption(spec.options, isDefault);
+        if (!activateOption(spec.options, hasValue(spec.value))) {
+          activateOption(spec.options, isDefault);
+        }
       }
 
-      return field({name: spec.name, label: spec.label, control: generator(spec)});
+      return generator(spec);
     });
 
     return flatten(generatedFields).filter(Boolean).join('');

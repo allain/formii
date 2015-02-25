@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha",
-    "build-example": "browserify example/example.js -o example/bundle.js"
+    "build": "node_modules/.bin/browserify example/example.js -o example/bundle.js",
+    "watch": "node_modules/.bin/watchify example/example.js -o example/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "~1.8.1",
-    "mocha": "~1.17.0"
+    "mocha": "~1.17.0",
+    "watchify": "^2.4.0"
   }
 }

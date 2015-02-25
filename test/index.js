@@ -4,165 +4,140 @@ var assert = require('chai').assert;
 var Formii = require('..');
 
 describe('Formii', function () {
-  it('can be created with minimal options', function (done) {
+  it('can be created with minimal options', function () {
     var f = new Formii([]);
 
     assert(f instanceof Formii);
-    done();
   });
 
-  it('renders with label if field specifies one', function(done) {
+  it.skip('renders with label if field specifies one', function() {
     var f = new Formii([
       {type: 'text', name: 'a', label: 'A'}
     ]);
 
     assert.equal(
-      '<div class="form"><div class="field"><label for="a">A</label><input type="text" id="a" name="a"></div></div>',
+      '<form class="form"><div class="field"><label for="a">A</label><input type="text" id="a" name="a"></div></form>',
       f.html()
     );
-    done();
   });
 
-  it('specifying html string injects as is', function(done) {
+  it('specifying html string injects as is', function() {
     var f = new Formii([
       '<section>',
       '</section>'
     ]);
 
     assert.equal(
-      '<div class="form"><section></section></div>',
+      '<form class="form"><section></section></form>',
       f.html()
     );
-    done();
   });
 
   describe('field types', function () {
-    describe('text', function() {
-      it('renders simple case', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'text'}
-        ]);
+    describe('text,password,email', function() {
+      it('renders simple case', function () {
+        ['email', 'text', 'password'].forEach(function(type) {
+          var f = new Formii([
+            {name: 'a', type: type}
+          ]);
 
-        assert.equal('<div class="form"><div class="field"><input type="text" id="a" name="a"></div></div>', f.html());
-        done();
+          assert.equal([
+              '<form class="form">',
+              '<div class="form-group">',
+              '<input type="', type, '" class="form-control" id="a" name="a">',
+              '</div>',
+              '</form>'
+          ].join(''), f.html());
+        });
       });
 
-      it('renders with value from doc', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'text'}
-        ]);
+      it('renders with value from doc', function () {
+        ['email', 'text', 'password'].forEach(function(type) {
+          var f = new Formii([
+            {name: 'a', type: type}
+          ]);
 
-        assert.equal('<div class="form"><div class="field"><input type="text" id="a" name="a" value="hello"></div></div>', f.html({a: 'hello'}));
-        done();
-      });
-    });
-
-    describe('email', function() {
-      it('renders simple case', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'email'}
-        ]);
-
-        assert.equal('<div class="form"><div class="field"><input type="email" id="a" name="a"></div></div>', f.html());
-        done();
-      });
-      
-      it('renders with value from doc', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'email'}
-        ]);
-
-        assert.equal('<div class="form"><div class="field"><input type="email" id="a" name="a" value="hello@a.com"></div></div>', f.html({a: 'hello@a.com'}));
-        done();
+          assert.equal([
+              '<form class="form">',
+              '<div class="form-group">',
+              '<input type="', type, '" class="form-control" id="a" name="a" value="T">',
+              '</div>',
+              '</form>'
+          ].join(''), f.html({a: 'T'}));
+        });
       });
     });
 
-    describe('checkbox', function(done) {
-      it('renders simple case', function (done) {
+    describe('checkbox', function() {
+      it('renders simple case', function () {
         var f = new Formii([
           {name: 'a', type: 'checkbox'}
         ]);
 
-        assert.equal('<div class="form"><div class="field"><input type="checkbox" id="a" name="a" value="1"></div></div>', f.html());
-        done();
+        assert.equal('<form class="form"><div class="checkbox"><label for="a"><input type="checkbox" id="a" name="a" value="1"></label></div></form>', f.html());
       });
 
-      it('renders with value', function(done) {
+      it('renders with label properly', function () {
         var f = new Formii([
-          {name: 'a', type: 'checkbox'}
+          {name: 'a', type: 'checkbox', label: 'Test'}
+        ]);
+
+        assert.equal('<form class="form"><div class="checkbox"><label for="a"><input type="checkbox" id="a" name="a" value="1"> Test</label></div></form>', f.html());
+      });
+
+      it('renders with value', function() {
+        var f = new Formii([
+          {name: 'a', type: 'checkbox'},
+          {name: 'b', type: 'checkbox'},
+          {name: 'c', type: 'checkbox'},
         ]);
 
         assert.equal(
-          '<div class="form"><div class="field"><input type="checkbox" id="a" name="a" value="1" checked="checked"></div></div>',
-          f.html({a: 1})
+          [
+            '<form class="form">',
+            '<div class="checkbox">',
+            '<label for="a"><input type="checkbox" id="a" name="a" value="1" checked="checked"></label>',
+            '</div>',
+            '<div class="checkbox">',
+            '<label for="b"><input type="checkbox" id="b" name="b" value="1"></label>',
+            '</div>',
+            '<div class="checkbox">',
+            '<label for="c"><input type="checkbox" id="c" name="c" value="1"></label>',
+            '</div>',
+            '</form>'
+          ].join(''),
+          f.html({a: 1, b: 0})
         );
-
-        assert.equal(
-          '<div class="form"><div class="field"><input type="checkbox" id="a" name="a" value="1"></div></div>',
-          f.html({a: 0})
-        );
-        done();
-      });
-
-    });
-
-    describe('password', function() {
-      it('renders simple case', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'password'}
-        ]);
-
-        assert.equal(
-          '<div class="form"><div class="field"><input type="password" id="a" name="a"></div></div>',
-          f.html()
-        );
-
-        done();
-      });
-
-      it('renders with value', function (done) {
-        var f = new Formii([
-          {name: 'a', type: 'password'}
-        ]);
-
-        assert.equal(
-          '<div class="form"><div class="field"><input type="password" id="a" name="a" value="test"></div></div>',
-          f.html({a: 'test'})
-        );
-
-        done();
       });
     });
 
     describe('textarea', function() {
-      it('renders simple case', function(done) {
+      it('renders simple case', function() {
         var f = new Formii([
           {name: 'a', type: 'textarea'}
         ]);
 
         assert.equal(
-          '<div class="form"><div class="field"><textarea id="a" name="a"></textarea></div></div>',
+          '<form class="form"><div class="form-group"><textarea id="a" name="a"></textarea></div></form>',
           f.html()
         );
-        done();
       });
 
-      it('renders with value', function(done) {
+      it('renders with value', function() {
         var f = new Formii([
           {name: 'a', type: 'textarea'}
         ]);
 
         assert.equal(
-          '<div class="form"><div class="field"><textarea id="a" name="a">Testing</textarea></div></div>',
+          '<form class="form"><div class="form-group"><textarea id="a" name="a">Testing</textarea></div></form>',
           f.html({a: 'Testing'})
         );
-        done();
       });
 
     });
 
     describe('radio', function() {
-      it('renders simple case', function (done) {
+      it('renders simple case', function () {
         var f = new Formii([
           {name: 'a', type: 'radio', options: [
             {value: 'b', label: 'B'},
@@ -171,22 +146,18 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="b">',
-          '<label>B</label>',
+          '<form class="form">',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="b"> B</label>',
           '</div>',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="c">',
-          '<label>C</label>',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="c"> C</label>',
           '</div>',
-          '</div>',
-          '</div>'].join(''), f.html());
-        done();
+          '</form>'
+        ].join(''), f.html());
       });
 
-      it('supports value', function (done) {
+      it('supports value', function () {
         var f = new Formii([
           {name: 'a', type: 'radio', options: [
             {value: 'b', label: 'B'},
@@ -195,24 +166,18 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="b">',
-          '<label>B</label>',
+          '<form class="form">',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="b"> B</label>',
           '</div>',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="c" checked="checked">',
-          '<label>C</label>',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="c" checked="checked"> C</label>',
           '</div>',
-          '</div>',
-          '</div>'].join(''),
-          f.html({a: 'c'})
-        );
-        done();
+          '</form>'
+        ].join(''), f.html({a: 'c'}));
       });
 
-      it('supports default value', function (done) {
+      it('supports default value', function () {
         var f = new Formii([
           {name: 'a', type: 'radio', options: [
             {value: 'b', label: 'B', default: true},
@@ -221,26 +186,20 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="b" checked="checked">',
-          '<label>B</label>',
+          '<form class="form">',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="b" checked="checked"> B</label>',
           '</div>',
-          '<div class="option">',
-          '<input type="radio" id="a" name="a" value="c">',
-          '<label>C</label>',
+          '<div class="radio">',
+          '<label for="a"><input type="radio" id="a" name="a" value="c"> C</label>',
           '</div>',
-          '</div>',
-          '</div>'].join(''),
-          f.html()
-        );
-        done();
+          '</form>'
+        ].join(''), f.html());
       });
     });
 
     describe('select', function() {
-      it('renders basic case', function (done) {
+      it('renders basic case', function () {
         var f = new Formii([
           {name: 'a', type: 'select', options: [
             {value: 'b', label: 'B'},
@@ -249,19 +208,18 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
+          '<form class="form">',
+          '<div class="form-group">',
           '<select id="a" name="a">',
           '<option value="b">B</option>',
           '<option value="c">C</option>',
           '</select>',
           '</div>',
-          '</div>'
+          '</form>'
         ].join(''), f.html());
-        done();
       });
 
-      it('supports value', function (done) {
+      it('supports value', function () {
         var f = new Formii([
           {name: 'a', type: 'select', options: [
             {value: 'b', label: 'B'},
@@ -270,19 +228,18 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
+          '<form class="form">',
+          '<div class="form-group">',
           '<select id="a" name="a">',
           '<option value="b">B</option>',
           '<option value="c" selected="selected">C</option>',
           '</select>',
           '</div>',
-          '</div>'
+          '</form>'
         ].join(''), f.html({a: 'c'}));
-        done();
       });
 
-      it('supports default', function (done) {
+      it('supports default', function () {
         var f = new Formii([
           {name: 'a', type: 'select', options: [
             {value: 'b', label: 'B', default: true},
@@ -291,115 +248,103 @@ describe('Formii', function () {
         ]);
 
         assert.equal([
-          '<div class="form">',
-          '<div class="field">',
+          '<form class="form">',
+          '<div class="form-group">',
           '<select id="a" name="a">',
           '<option value="b" selected="selected">B</option>',
           '<option value="c">C</option>',
           '</select>',
           '</div>',
-          '</div>'
+          '</form>'
         ].join(''), f.html());
-        done();
       });
     });
 
     describe('fieldset', function() {
-      it('renders simple case', function(done) {
+      it('renders simple case', function() {
         var f = new Formii([
           {
             type: 'fieldset',
             fields: [
-              {type: 'text', name: 'a'}
+              '<test>'
             ]
           }
         ]);
 
         assert.equal([
-          '<div class="form">',
+          '<form class="form">',
           '<fieldset>',
-          '<div class="field">',
-          '<input type="text" id="a" name="a">',
-          '</div>',
+          '<test>',
           '</fieldset>',
-          '</div>'
+          '</form>'
         ].join(''), f.html());
-        done();
       });
 
-      it('renders label as legend', function(done) {
+      it('renders label as legend', function() {
         var f = new Formii([
           {
             type: 'fieldset',
             label: 'Fieldset',
             fields: [
-              {type: 'text', name: 'a'}
+              '<test>'
             ]
           }
         ]);
 
         assert.equal([
-          '<div class="form">',
+          '<form class="form">',
           '<fieldset>',
           '<legend>Fieldset</legend>',
-          '<div class="field">',
-          '<input type="text" id="a" name="a">',
-          '</div>',
+          '<test>',
           '</fieldset>',
-          '</div>'
+          '</form>'
         ].join(''), f.html());
-        done();
       });
     });
 
     describe('repeat', function() {
-      it('renders simple case', function(done) {
+      it('renders simple case', function() {
         var f = new Formii([
           {
             type: 'repeat',
             name: 'items',
             fields: [
-              {type: 'text', name: 'item'}
+              '<test>'
             ]
           }
         ]);
 
         assert.equal(
           f.html(), [
-            '<div class="form">',
+            '<form class="form">',
             '<div class="repeat">',
             '<div class="repeated">',
             '<div class="fields">',
-            '<div class="field">',
-            '<input type="text" id="items-0-item" name="item">',
+            '<test>',
             '</div>',
             '</div>',
             '</div>',
-            '</div>',
-            '</div>'
+            '</form>'
           ].join(''));
-        done();
       });
 
-      it('renders multiple when items given', function(done) {
+      it('renders multiple when items given', function() {
         var f = new Formii([
           {
             type: 'repeat',
             name: 'items',
             fields: [
-              {type: 'text', name: 'item'}
+              '<test>'
             ]
           }
         ]);
 
         assert.equal([
-          '<div class="form">',
+          '<form class="form">',
           '<div class="repeat">',
           '<div class="repeated">',
           '<div class="fields">',
-          '<div class="field">',
-          '<input type="text" id="items-0-item" name="item" value="A">',
-          '</div>',
+          '<test>',
           '</div>',
           '<div class="actions">',
           '<button data-action="remove-repeated">Remove</button>',
@@ -407,9 +352,7 @@ describe('Formii', function () {
           '</div>',
           '<div class="repeated">',
           '<div class="fields">',
-          '<div class="field">',
-          '<input type="text" id="items-1-item" name="item" value="B">',
-          '</div>',
+          '<test>',
           '</div>',
           '<div class="actions">',
           '<button data-action="remove-repeated">Remove</button>',
@@ -417,23 +360,18 @@ describe('Formii', function () {
           '</div>',
           '<div class="repeated">',
           '<div class="fields">',
-          '<div class="field">',
-          '<input type="text" id="items-2-item" name="item">',
+          '<test>',
           '</div>',
           '</div>',
           '</div>',
-            '</div>',
-          '</div>'
+          '</form>'
         ].join(''), f.html({
           items: [
             {item: 'A'},
             {item: 'B'}
           ]
         }));
-        done();
       });
     });
-
   });
-
 });

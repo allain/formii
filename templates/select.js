@@ -1,5 +1,7 @@
 module.exports = function(spec) {
   return [
+    '<div class="form-group">',
+    (spec.label ? '<label for="' + spec.id + '">' + spec.label + '</label>' : ''),
     '<select id="', spec.id, '" name="', spec.name, '">',
     spec.options.map(function(s) {
       return [
@@ -10,6 +12,7 @@ module.exports = function(spec) {
         '</option>'
       ].join('');
     }).join(''),
-    '</select>'
+    '</select>',
+    '</div>'
   ].join('');
 };

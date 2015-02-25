@@ -7,6 +7,8 @@ function Formii(specs, options) {
 
   options = options || {};
 
+  // Initially I had impleted these as Handlebars templates but the overhead was huge.
+  // Ideally, any third party compiled template functions can be passed in, a long as they return a string.
   var templates = {
     text: require('./templates/text'),
     email: require('./templates/email'),

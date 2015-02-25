@@ -210,7 +210,7 @@ describe('Formii', function () {
         assert.equal([
           '<form class="form">',
           '<div class="form-group">',
-          '<select id="a" name="a">',
+          '<select id="a" name="a" class="form-control">',
           '<option value="b">B</option>',
           '<option value="c">C</option>',
           '</select>',
@@ -230,7 +230,7 @@ describe('Formii', function () {
         assert.equal([
           '<form class="form">',
           '<div class="form-group">',
-          '<select id="a" name="a">',
+          '<select id="a" name="a" class="form-control">',
           '<option value="b">B</option>',
           '<option value="c" selected="selected">C</option>',
           '</select>',
@@ -250,7 +250,7 @@ describe('Formii', function () {
         assert.equal([
           '<form class="form">',
           '<div class="form-group">',
-          '<select id="a" name="a">',
+          '<select id="a" name="a" class="form-control">',
           '<option value="b" selected="selected">B</option>',
           '<option value="c">C</option>',
           '</select>',
@@ -317,7 +317,7 @@ describe('Formii', function () {
         assert.equal(
           f.html(), [
             '<form class="form">',
-            '<div class="repeat">',
+            '<div class="repeat form-group">',
             '<div class="repeated">',
             '<div class="fields">',
             '<test>',
@@ -341,13 +341,13 @@ describe('Formii', function () {
 
         assert.equal([
           '<form class="form">',
-          '<div class="repeat">',
+          '<div class="repeat form-group">',
           '<div class="repeated">',
           '<div class="fields">',
           '<test>',
           '</div>',
           '<div class="actions">',
-          '<button data-action="remove-repeated">Remove</button>',
+          '<button data-action="remove-repeated" type="button">Remove</button>',
           '</div>',
           '</div>',
           '<div class="repeated">',
@@ -355,7 +355,7 @@ describe('Formii', function () {
           '<test>',
           '</div>',
           '<div class="actions">',
-          '<button data-action="remove-repeated">Remove</button>',
+          '<button data-action="remove-repeated" type="button">Remove</button>',
           '</div>',
           '</div>',
           '<div class="repeated">',

@@ -1,20 +1,4 @@
-# formii
-
-A simple form builder intended to be used with browserify. The eventual goal is to be able to take some of the grunt
-work out of building an admin portal.
-
-## Installation
-
-This module is installed via npm:
-
-``` bash
-$ npm install --save formii
-```
-
-## Example Usage
-
-``` js
-var Formii = require('formii');
+var Formii = require('..');
 
 var form = new Formii([
   {type: 'email', name: 'email', label: 'Email'},
@@ -40,4 +24,3 @@ document.getElementById('container').innerHTML = form.html({
     {item: 'item B'}
   ]
 });
-```

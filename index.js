@@ -1,45 +1,103 @@
-var defaults = require('defaults');
-var Handlebars = require('handlebars');
-
 module.exports = Formii;
 
 function Formii(specs, options) {
   if (!(this instanceof Formii)) {
-    return new Formii(spec, options);
+    return new Formii(specs, options);
   }
 
-  options = defaults(options, {
-    templates: {
-      text: '<input type="text" id="{{name}}" name="{{name}}">',
-      checkbox: '<input type="checkbox" id="{{name}}" name="{{name}}" value="{{#if value}}{{value}}{{else}}1{{/if}}">',
-      password: '<input type="password" id="{{name}}" name="{{name}}">',
-      radio: '{{#each options}}<div class="option"><input type="radio" id="{{../name}}" name="{{../name}}" value="{{value}}"><label>{{label}}</label></div>{{/each}}',
-      select: '<select id="{{name}}" name="{{name}}">{{#each options}}<option value="{{value}}">{{label}}</option>{{/each}}</select>',
-      textarea: '<textarea id="{{name}}" name="{{name}}">{{value}}</textarea>'
-    }
+  options = options || {};
+
+  var templates = {
+    text: require('./templates/text'),
+    email: require('./templates/email'),
+    checkbox: require('./templates/checkbox'),
+    password: require('./templates/password'),
+    radio: require('./templates/radio'),
+    select: require('./templates/select'),
+    textarea: require('./templates/textarea'),
+    fieldset: require('./templates/fieldset'),
+    repeat: require('./templates/repeat'),
+    field: require('./templates/field')
+  };
+
+  // Override built-in templates
+  Object.keys(options.templates || {}).forEach(function(templateName) {
+    templates[templateName] = options.templates[templateName];
   });
 
-  Object.keys(options.templates).forEach(function(templateName) {
-    options.templates[templateName] = Handlebars.compile(options.templates[templateName]);
-  });
-
-
-
-  this.html = function() {
+  this.html = function(doc) {
     return flatten([
-      '<div class="fields">',
-      specs.map(function(spec) {
-        var generator = options.templates[spec.type];
-
-        if (!generator) {
-          return '<!-- unknown type: ' + spec.type + ' -->';
-        }
-
-        return ['<div class="field">', generator(spec, options), '</div>'];
-      }),
+      '<div class="form">',
+      generateFields(specs, doc || {}),
       '</div>'
     ]).filter(Boolean).join('');
   };
+
+  function generateFields(specs, doc, prefix) {
+    prefix = prefix || '';
+
+    var field = templates.field;
+
+    var generatedFields = specs.map(function(spec) {
+      if (typeof spec === 'string') {
+        return spec;
+      }
+
+      var generator = templates[spec.type];
+
+      if (!generator) {
+        return '<!-- unknown type: ' + spec.type + ' -->';
+      }
+
+      if (spec.type === 'fieldset') {
+        return generator({label: spec.label, fields: generateFields(spec.fields, doc, prefix)}, options);
+      }
+
+      if (spec.type === 'repeat') {
+        var repeated = (doc[spec.name] || []).map(function(item, index) {
+          return {removable: true, fields: generateFields(spec.fields, item, p([prefix, spec.name, index]))};
+        });
+        repeated.push({removable: false, fields: generateFields(spec.fields, {}, p([prefix, spec.name, (doc[spec.name] || []).length]))});
+
+        return generator({label: spec.label, repeated: repeated});
+      }
+
+      spec.value = doc[spec.name];
+      spec.id = p([prefix, spec.name]);
+
+      if (spec.type === 'radio' || spec.type === 'select') {
+        activateOption(spec.options, hasValue(spec.value)) || activateOption(spec.options, isDefault);
+      }
+
+      return field({name: spec.name, label: spec.label, control: generator(spec)});
+    });
+
+    return flatten(generatedFields).filter(Boolean).join('');
+  }
+}
+
+function p(parts) {
+  return parts.filter(function(part) {
+    return part !== '';
+  }).join('-');
+}
+
+function hasValue(value) {
+  return function(obj) {
+    return obj.value === value;
+  };
+}
+
+function isDefault(obj) {
+  return !!obj.default;
+}
+
+function activateOption(options, criteria) {
+  var activeOption = options.filter(criteria)[0];
+  if (activeOption) {
+    activeOption.active = true;
+  }
+  return !!activeOption;
 }
 
 function flatten(arr) {

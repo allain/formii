@@ -19,6 +19,7 @@ var Formii = require('formii');
 var form = new Formii([
   {type: 'email', name: 'email', label: 'Email'},
   {type: 'password', name: 'password', label: 'Password'},
+  {type: 'text', name: 'tick', label: 'Tick'},
   {type: 'fieldset', label: 'Options', fields: [
     {type: 'select', name: 'favoriteFruit', options: [
       {value: 'apple', label: 'Apple'},
@@ -31,13 +32,25 @@ var form = new Formii([
   ]}
 ]);
 
-document.getElementById('container').innerHTML = form.html({
+var doc = {
   email: 'allain.lalonde@gmail.com',
   favoriteFruit: 'orange',
-  rememberMe: 1,
+  rememberMe: true,
+  tick: 0,
   items: [
     {item: 'item A'},
     {item: 'item B'}
   ]
+};
+
+var binding = form.bind(document.getElementById('container'), doc);
+
+binding.on('change', function(doc) {
+  console.log(doc);
 });
+
+setInterval(function() {
+  doc.tick ++;
+  binding.update(doc);
+}, 10000);
 ```

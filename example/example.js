@@ -26,8 +26,8 @@ var form = new Formii([
 
 var binding = form.bind(document.getElementById('container'), {
   email: 'allain.lalonde@gmail.com',
-  favoriteFruit: 'orange',  
-  rememberMe: 1,
+  favoriteFruit: 'orange',
+  rememberMe: true,
   items: [
     {item: 'item A'},
     {item: 'item B'}

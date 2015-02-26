@@ -1,8 +1,8 @@
 module.exports = function(spec) {
   return [
     '<div class="repeat form-group">',
-    spec.label ? ['<label>', spec.label, '</div>'].join('') : '',
-    spec.repeated.map(function(r) {
+    spec.label ? ['<label>', spec.label, '</label>'].join('') : '',
+    spec.repeated.map(function(r, index) {
       return [
         '<div class="repeated">',
         '<div class="fields">',
@@ -10,7 +10,7 @@ module.exports = function(spec) {
         '</div>',
         r.removable ? [
           '<div class="actions">',
-          '<button data-action="remove-repeated" type="button">Remove</button>',
+          '<button data-action="delete" data-path="', r.id , '" type="button">Remove</button>',
           '</div>'
         ].join('') : '',
         '</div>'

@@ -46,24 +46,51 @@ function Formii(specs, options) {
   this.html = html;
 
   this.bind = function(elem, doc) {
+    // Moved this here otherwise unit tests could not be run outside of the browser
     var Delegate = require('dom-delegate').Delegate;
     var binding = new EventEmitter();
 
     binding.update = function(newDoc) {
-      if (JSON.stringify(newDoc) === JSON.stringify(doc)) return;
-
-      doc = newDoc;
-      patch(html(doc));
+      // Prevent infinite loops
+      if (JSON.stringify(newDoc) !== JSON.stringify(doc)) {
+        doc = newDoc;
+        update();
+      }
     };
 
     var patch = patcher(elem, this.html(doc));
     var delegate = new Delegate(elem);
-    delegate.on('change', 'input,textarea', function(e) {
+
+    delegate.on('change', 'input,textarea,select', function() {
       var jsonPath = '/' + this.id.replace(/-/g, '/');
-      pointer.set(doc, jsonPath, this.value);
+      if (this.type === 'checkbox') {
+        pointer.set(doc, jsonPath, this.checked ? true : undefined);
+      } else {
+        pointer.set(doc, jsonPath, this.value);
+      }
+
+      update();
+    });
+
+    delegate.on('click', 'button[type=button]', function() {
+      var jsonPath = '/' + this['data-path'].replace(/-/g, '/');
+      if (this['data-action'] === 'delete') {
+        var match = /^(.*)\/(\d+)$/.exec(jsonPath);
+        if (match) {
+          var arr = pointer.get(doc, match[1]);
+          arr.splice(match[2], 1);
+        } else {
+          pointer.set(doc, jsonPath, undefined);
+        }
+        update();
+      }
+    });
+
+
+    function update() {
       patch(html(doc));
       binding.emit('change', doc, self);
-    });
+    }
 
     process.nextTick(function() {
       binding.emit('change', doc, self);
@@ -94,9 +121,11 @@ function Formii(specs, options) {
 
       if (spec.type === 'repeat') {
         var repeated = (doc[spec.name] || []).map(function(item, index) {
-          return {removable: true, fields: generateFields(spec.fields, item, p([prefix, spec.name, index]))};
+          var id = p([prefix, spec.name, index]);
+          return {removable: true, fields: generateFields(spec.fields, item, id), id: id};
         });
-        repeated.push({removable: false, fields: generateFields(spec.fields, {}, p([prefix, spec.name, (doc[spec.name] || []).length]))});
+        var id = p([prefix, spec.name, (doc[spec.name] || []).length]);
+        repeated.push({removable: false, id: id, fields: generateFields(spec.fields, {}, id)});
 
         return generator({label: spec.label, repeated: repeated});
       }

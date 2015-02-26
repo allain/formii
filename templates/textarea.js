@@ -6,7 +6,7 @@ module.exports = function(spec) {
    spec.id,
    '" name="',
    spec.name,
-   '">',
+   '" class="form-control">',
    spec.value,
    '</textarea>',
    '</div>'

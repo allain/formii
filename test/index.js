@@ -118,7 +118,7 @@ describe('Formii', function () {
         ]);
 
         assert.equal(
-          '<form class="form"><div class="form-group"><textarea id="a" name="a"></textarea></div></form>',
+          '<form class="form"><div class="form-group"><textarea id="a" name="a" class="form-control"></textarea></div></form>',
           f.html()
         );
       });
@@ -129,7 +129,7 @@ describe('Formii', function () {
         ]);
 
         assert.equal(
-          '<form class="form"><div class="form-group"><textarea id="a" name="a">Testing</textarea></div></form>',
+          '<form class="form"><div class="form-group"><textarea id="a" name="a" class="form-control">Testing</textarea></div></form>',
           f.html({a: 'Testing'})
         );
       });
@@ -147,11 +147,13 @@ describe('Formii', function () {
 
         assert.equal([
           '<form class="form">',
+          '<div class="form-group">',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="b"> B</label>',
           '</div>',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="c"> C</label>',
+          '</div>',
           '</div>',
           '</form>'
         ].join(''), f.html());
@@ -167,11 +169,13 @@ describe('Formii', function () {
 
         assert.equal([
           '<form class="form">',
+          '<div class="form-group">',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="b"> B</label>',
           '</div>',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="c" checked="checked"> C</label>',
+          '</div>',
           '</div>',
           '</form>'
         ].join(''), f.html({a: 'c'}));
@@ -187,11 +191,13 @@ describe('Formii', function () {
 
         assert.equal([
           '<form class="form">',
+          '<div class="form-group">',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="b" checked="checked"> B</label>',
           '</div>',
           '<div class="radio">',
           '<label for="a"><input type="radio" id="a" name="a" value="c"> C</label>',
+          '</div>',
           '</div>',
           '</form>'
         ].join(''), f.html());

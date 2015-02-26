@@ -1,5 +1,13 @@
 module.exports = function(spec) {
-  return (spec.options || []).map(function(option) {
+  var parts = [
+    '<div class="form-group">'
+  ];
+
+  if (spec.label) {
+    parts.push('<label>' + spec.label + '</label>');
+  }
+
+  parts.push((spec.options || []).map(function(option) {
     return [
     '<div class="radio">',
     '<label for="', spec.id, '">',
@@ -8,5 +16,9 @@ module.exports = function(spec) {
     '</label>',
     '</div>'
     ].join('');
-  }).join('');
+  }).join(''));
+
+  parts.push('</div>');
+  
+  return parts.join('');
 };

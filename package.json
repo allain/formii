@@ -12,7 +12,10 @@
     "type": "git",
     "url": "https://github.com/allain/formii"
   },
-  "keywords": ["form", "builder"],
+  "keywords": [
+    "form",
+    "builder"
+  ],
   "author": "allain <allain.lalonde@gmail.com>",
   "license": "ISC",
   "bugs": {
@@ -22,5 +25,10 @@
     "chai": "~1.8.1",
     "mocha": "~1.17.0",
     "watchify": "^2.4.0"
+  },
+  "dependencies": {
+    "dom-delegate": "^2.0.3",
+    "html-patcher": "0.0.3",
+    "json-pointer": "^0.3.0"
   }
 }

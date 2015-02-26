@@ -1,9 +1,18 @@
 module.exports = Formii;
 
+var patcher = require('html-patcher');
+var pointer = require('json-pointer');
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
+
+util.inherits(Formii, EventEmitter);
+
 function Formii(specs, options) {
   if (!(this instanceof Formii)) {
     return new Formii(specs, options);
   }
+
+  var self = this;
 
   options = options || {};
 
@@ -27,13 +36,41 @@ function Formii(specs, options) {
     templates[templateName] = options.templates[templateName];
   });
 
-  this.html = function(doc) {
+  function html(doc) {
     return flatten([
       '<form class="form">',
       generateFields(specs, doc || {}),
       '</form>'
     ]).filter(Boolean).join('');
-  };
+  }
+  this.html = html;
+
+  this.bind = function(elem, doc) {
+    var Delegate = require('dom-delegate').Delegate;
+    var binding = new EventEmitter();
+
+    binding.update = function(newDoc) {
+      if (JSON.stringify(newDoc) === JSON.stringify(doc)) return;
+
+      doc = newDoc;
+      patch(html(doc));
+    };
+
+    var patch = patcher(elem, this.html(doc));
+    var delegate = new Delegate(elem);
+    delegate.on('change', 'input,textarea', function(e) {
+      var jsonPath = '/' + this.id.replace(/-/g, '/');
+      pointer.set(doc, jsonPath, this.value);
+      patch(html(doc));
+      binding.emit('change', doc, self);
+    });
+
+    process.nextTick(function() {
+      binding.emit('change', doc, self);
+    });
+
+    return binding;
+	};
 
   function generateFields(specs, doc, prefix) {
     prefix = prefix || '';

@@ -1,7 +1,7 @@
 {
   "name": "formii",
   "version": "1.0.0",
-  "description": "A simple form builder module.",
+  "description": "A simple form data-binding and builder tool.",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha",

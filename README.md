@@ -1,7 +1,8 @@
 # formii
 
-A simple form builder intended to be used with browserify. The eventual goal is to be able to take some of the grunt
-work out of building an admin portal.
+A simple form data-binding and builder tool for use with browserify.
+
+Performs data binding against a JSON object that changes based on what the form looks like.
 
 ## Installation
 
